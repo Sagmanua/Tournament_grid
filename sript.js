@@ -5,6 +5,7 @@ btn.addEventListener('click', () => {
     const newDiv = document.createElement('div');
     newDiv.innerHTML = `<label>Name: </label><input type="text" class="name-input">`;
     container.appendChild(newDiv);
+    updatePlayerCount(); 
 });
 
 let remainingNames = [];
@@ -22,10 +23,12 @@ function easeOut(t, b, c, d) {
 
 function startDraft() {
     const inputs = document.querySelectorAll('.name-input');
+    const teamSize = parseInt(document.getElementById('team-size').value);
     remainingNames = Array.from(inputs).map(i => i.value).filter(v => v.trim() !== "");
     
-    if (remainingNames.length < 2) {
-        alert("Please enter at least 2 names!");
+    // Check if total players are divisible by the chosen team size
+    if (remainingNames.length < teamSize || remainingNames.length % teamSize !== 0) {
+        alert(`Please enter a number of names divisible by ${teamSize} (Total: ${remainingNames.length})`);
         return;
     }
 
@@ -55,13 +58,11 @@ function setupWheel(names) {
 }
 
 function drawRouletteWheel(names) {
-    // 1. Clear the canvas once at the very start
     ctx.clearRect(0, 0, 400, 400);
     
     const outsideRadius = 180;
     const textRadius = 140;
 
-    // 2. Loop to draw segments
     for(let i = 0; i < names.length; i++) {
         const angle = startAngle + i * arc;
 
@@ -74,7 +75,6 @@ function drawRouletteWheel(names) {
         ctx.fill();
         ctx.stroke(); 
 
-        // 3. Draw text
         ctx.save();
         ctx.fillStyle = "white"; 
         ctx.font = "bold 14px Arial";
@@ -85,13 +85,12 @@ function drawRouletteWheel(names) {
         ctx.restore();
     }
 
-    // 4. Draw the indicator ONCE after all segments are drawn
-    // This ensures it sits on top and doesn't flicker
+
 ctx.fillStyle = "black";
     ctx.beginPath();
-    ctx.moveTo(400, 190);  // Right side starting point (near edge)
-    ctx.lineTo(400, 210);  // Top point of triangle (pointing left)
-    ctx.lineTo(380, 200);  // Bottom point of triangle (pointing left)
+    ctx.moveTo(400, 190); 
+    ctx.lineTo(400, 210); 
+    ctx.lineTo(380, 200); 
     ctx.fill();
 }
 
@@ -110,17 +109,26 @@ function spin(names) {
 }
 
 function stopRotate(names) {
+    const teamSize = parseInt(document.getElementById('team-size').value);
     const index = Math.floor(((2 * Math.PI) - (startAngle % (2 * Math.PI))) / arc) % names.length;
     const picked = names.splice(index, 1)[0];
 
-    if (draftedOrder.length === 0 || draftedOrder[draftedOrder.length - 1].length === 2) {
+    // Logic to create a new team array if empty OR if the last team is full
+    if (draftedOrder.length === 0 || draftedOrder[draftedOrder.length - 1].length === teamSize) {
         draftedOrder.push([picked]);
     } else {
         draftedOrder[draftedOrder.length - 1].push(picked);
     }
 
     updateDraftBoard();
-    setTimeout(processNext, 1000);
+    
+    // Check if we still have names to draft
+    if (remainingNames.length > 0) {
+        setTimeout(processNext, 1000);
+    } else {
+        document.getElementById('roulette-container').style.display = "none";
+        finalizeTournament(draftedOrder);
+    }
 }
 
 function updateDraftBoard() {
@@ -148,7 +156,7 @@ function createRound(teams) {
         match.className = 'match';
         match.innerHTML = `
             <div class="player" onclick="advance(event)">${teams[i]}</div>
-            <div class="player" onclick="advance(event)">${teams[i+1] || "BYE"}</div>
+            <div class="player" onclick="advance(event)">${teams[i+1] || "Empty"}</div>
         `;
         roundDiv.appendChild(match);
     }
@@ -160,14 +168,49 @@ function createRound(teams) {
 
 function advance(event) {
     const clicked = event.target;
-    const container = clicked.parentElement;
-    if (container.dataset.done === "true") return;
-    container.dataset.done = "true";
-    container.style.backgroundColor = "#c8e6c9";
-    window.nextRoundPlayers.push(clicked.innerText);
-    if (++window.matchesFinished === window.totalMatchesInRound) {
-        if (window.nextRoundPlayers.length > 1) createRound(window.nextRoundPlayers);
-        else alert("Winner: " + window.nextRoundPlayers[0]);
+    const matchContainer = clicked.parentElement;
+
+    // Reset styles for both players in this match
+    const players = Array.from(matchContainer.querySelectorAll('.player'));
+    players.forEach(p => {
+        p.classList.remove('winner', 'loser');
+    });
+
+    // Mark clicked as winner, the other as loser
+    clicked.classList.add('winner');
+    const opponent = players.find(p => p !== clicked);
+    if (opponent) {
+        opponent.classList.add('loser');
+    }
+
+    // Mark match as done
+    matchContainer.dataset.done = "true";
+
+    // Re-calculate the winners for the current round
+    // We look for all matches in the current round that have a winner
+    const currentRound = matchContainer.parentElement;
+    const allMatches = Array.from(currentRound.querySelectorAll('.match'));
+    
+    // Check if every match in this round has a winner selected
+    const allDecided = allMatches.every(m => m.dataset.done === "true");
+
+    if (allDecided) {
+        // Collect all winners from this round to pass to the next
+        const winners = allMatches.map(m => m.querySelector('.winner').innerText);
+        
+        // Remove any existing subsequent rounds (in case user goes back and changes a pick)
+        const container = document.getElementById('bracket-container');
+        let nextSibling = currentRound.nextElementSibling;
+        while(nextSibling) {
+            container.removeChild(nextSibling);
+            nextSibling = currentRound.nextElementSibling;
+        }
+
+        if (winners.length > 1) {
+            setTimeout(() => createRound(winners), 500);
+        } else {
+            setTimeout(() => alert("Winner: " + winners[0]), 500);
+        }
     }
 }
 
@@ -176,12 +219,10 @@ function updatePlayerCount() {
     document.getElementById('player-count').innerText = inputs.length;
 }
 
-// Update the event listener for the "Add Name Field" button
 btn.addEventListener('click', () => {
     const newDiv = document.createElement('div');
     newDiv.innerHTML = `<label>Name: </label><input type="text" class="name-input">`;
     container.appendChild(newDiv);
     
-    // Call the count update whenever a new field is added
     updatePlayerCount();
 });

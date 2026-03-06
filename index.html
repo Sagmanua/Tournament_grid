@@ -12,11 +12,17 @@
         <div><label>Name: </label><input type="text" class="name-input" value="Player 1"></div>
         <div><label>Name: </label><input type="text" class="name-input" value="Player 2"></div>
     </div>
-    
     <div class="controls">
-        <button type="button" id="add-btn">Add Name Field</button>
-        <button onclick="startDraft()">Start Selection Draft</button>
-    </div>
+    <label>Players per team: </label>
+    <select id="team-size">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+    </select>
+    <button type="button" id="add-btn">Add Name Field</button>
+    <button onclick="startDraft()">Start Selection Draft</button>
+</div>
+
 
     <div id="roulette-container" style="display:none; text-align:center; margin: 20px 0;">
         <h2 id="status-msg">Spinning for next player...</h2>

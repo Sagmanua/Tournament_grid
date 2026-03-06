@@ -72,3 +72,6 @@
     font-size: 1.1em;
     margin-top: 10px;
 }
+
+.winner { background-color: #c8e6c9 !important; } /* Green */
+.loser { background-color: #ffcdd2 !important; }  /* Red */
