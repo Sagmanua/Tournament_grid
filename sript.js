@@ -1,13 +1,8 @@
 const container = document.getElementById('form-container');
 const btn = document.getElementById('add-btn');
+const spinBtn = document.getElementById('spin-btn'); // Ensure this exists in HTML
 
-btn.addEventListener('click', () => {
-    const newDiv = document.createElement('div');
-    newDiv.innerHTML = `<label>Name: </label><input type="text" class="name-input">`;
-    container.appendChild(newDiv);
-    updatePlayerCount(); 
-});
-
+// Initialize state
 let remainingNames = [];
 let draftedOrder = []; 
 let startAngle = 0;
@@ -15,18 +10,19 @@ let arc = 0;
 let spinTimeout = null;
 let ctx;
 
+// Helper: Easing function for spin
 function easeOut(t, b, c, d) {
     const ts = (t /= d) * t;
     const tc = ts * t;
     return b + c * (tc + -3 * ts + 3 * t);
 }
 
+// Logic to start the draft process
 function startDraft() {
     const inputs = document.querySelectorAll('.name-input');
     const teamSize = parseInt(document.getElementById('team-size').value);
     remainingNames = Array.from(inputs).map(i => i.value).filter(v => v.trim() !== "");
     
-    // Check if total players are divisible by the chosen team size
     if (remainingNames.length < teamSize || remainingNames.length % teamSize !== 0) {
         alert(`Please enter a number of names divisible by ${teamSize} (Total: ${remainingNames.length})`);
         return;
@@ -40,10 +36,12 @@ function startDraft() {
     processNext();
 }
 
+// Prepare the UI for the next manual spin
 function processNext() {
     if (remainingNames.length > 0) {
         setupWheel(remainingNames);
-        spin(remainingNames);
+        document.getElementById('spin-btn').style.display = 'inline-block';
+        document.getElementById('status-msg').innerText = "Press Spin to draft!";
     } else {
         document.getElementById('roulette-container').style.display = "none";
         finalizeTournament(draftedOrder);
@@ -59,13 +57,11 @@ function setupWheel(names) {
 
 function drawRouletteWheel(names) {
     ctx.clearRect(0, 0, 400, 400);
-    
     const outsideRadius = 180;
     const textRadius = 140;
 
     for(let i = 0; i < names.length; i++) {
         const angle = startAngle + i * arc;
-
         const hue = (i * (360 / names.length));
         ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
         
@@ -85,19 +81,20 @@ function drawRouletteWheel(names) {
         ctx.restore();
     }
 
-
-ctx.fillStyle = "black";
+    ctx.fillStyle = "black";
     ctx.beginPath();
-    ctx.moveTo(400, 190); 
-    ctx.lineTo(400, 210); 
-    ctx.lineTo(380, 200); 
-    ctx.fill();
+    ctx.moveTo(400, 190); ctx.lineTo(400, 210); ctx.lineTo(380, 200); ctx.fill();
 }
 
+// Manual spin trigger
 function spin(names) {
+    document.getElementById('spin-btn').style.display = 'none';
+    document.getElementById('status-msg').innerText = "Spinning...";
+    
     let spinAngleStart = Math.random() * 10 + 10;
     let spinTime = 0;
     let spinTimeTotal = 2000;
+    
     function rotateWheel() {
         spinTime += 30;
         if(spinTime >= spinTimeTotal) { stopRotate(names); return; }
@@ -113,7 +110,6 @@ function stopRotate(names) {
     const index = Math.floor(((2 * Math.PI) - (startAngle % (2 * Math.PI))) / arc) % names.length;
     const picked = names.splice(index, 1)[0];
 
-    // Logic to create a new team array if empty OR if the last team is full
     if (draftedOrder.length === 0 || draftedOrder[draftedOrder.length - 1].length === teamSize) {
         draftedOrder.push([picked]);
     } else {
@@ -122,7 +118,6 @@ function stopRotate(names) {
 
     updateDraftBoard();
     
-    // Check if we still have names to draft
     if (remainingNames.length > 0) {
         setTimeout(processNext, 1000);
     } else {
@@ -161,45 +156,26 @@ function createRound(teams) {
         roundDiv.appendChild(match);
     }
     container.appendChild(roundDiv);
-    window.totalMatchesInRound = Math.ceil(teams.length / 2);
-    window.matchesFinished = 0;
-    window.nextRoundPlayers = [];
 }
 
 function advance(event) {
     const clicked = event.target;
     const matchContainer = clicked.parentElement;
-
-    // Reset styles for both players in this match
     const players = Array.from(matchContainer.querySelectorAll('.player'));
-    players.forEach(p => {
-        p.classList.remove('winner', 'loser');
-    });
-
-    // Mark clicked as winner, the other as loser
+    
+    players.forEach(p => p.classList.remove('winner', 'loser'));
     clicked.classList.add('winner');
     const opponent = players.find(p => p !== clicked);
-    if (opponent) {
-        opponent.classList.add('loser');
-    }
+    if (opponent) opponent.classList.add('loser');
 
-    // Mark match as done
     matchContainer.dataset.done = "true";
 
-    // Re-calculate the winners for the current round
-    // We look for all matches in the current round that have a winner
     const currentRound = matchContainer.parentElement;
     const allMatches = Array.from(currentRound.querySelectorAll('.match'));
-    
-    // Check if every match in this round has a winner selected
-    const allDecided = allMatches.every(m => m.dataset.done === "true");
-
-    if (allDecided) {
-        // Collect all winners from this round to pass to the next
+    if (allMatches.every(m => m.dataset.done === "true")) {
         const winners = allMatches.map(m => m.querySelector('.winner').innerText);
-        
-        // Remove any existing subsequent rounds (in case user goes back and changes a pick)
         const container = document.getElementById('bracket-container');
+        
         let nextSibling = currentRound.nextElementSibling;
         while(nextSibling) {
             container.removeChild(nextSibling);
@@ -214,15 +190,10 @@ function advance(event) {
     }
 }
 
-function updatePlayerCount() {
-    const inputs = document.querySelectorAll('.name-input');
-    document.getElementById('player-count').innerText = inputs.length;
-}
-
+// UI Event Listeners
 btn.addEventListener('click', () => {
     const newDiv = document.createElement('div');
     newDiv.innerHTML = `<label>Name: </label><input type="text" class="name-input">`;
     container.appendChild(newDiv);
-    
-    updatePlayerCount();
+    document.getElementById('player-count').innerText = document.querySelectorAll('.name-input').length;
 });

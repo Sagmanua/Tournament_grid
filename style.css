@@ -75,3 +75,15 @@
 
 .winner { background-color: #c8e6c9 !important; } /* Green */
 .loser { background-color: #ffcdd2 !important; }  /* Red */
+
+#spin-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+#spin-btn:hover {
+    background-color: #45a049;
+}
