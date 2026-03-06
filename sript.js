@@ -92,8 +92,8 @@ function spin(names) {
     document.getElementById('status-msg').innerText = "Spinning...";
     
     let spinAngleStart = Math.random() * 10 + 10;
-    let spinTime = 0;
-    let spinTimeTotal = 2000;
+    let spinTime = 10;
+    let spinTimeTotal = 6000;
     
     function rotateWheel() {
         spinTime += 30;
