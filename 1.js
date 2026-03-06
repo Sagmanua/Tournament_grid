@@ -158,15 +158,6 @@ function createRound(teams) {
     container.appendChild(roundDiv);
 }
 
-function showWinner(name) {
-    const display = document.getElementById('winner-display');
-    // Ensure the CSS class is applied correctly for the style.css animation
-    display.className = 'winner-message'; 
-    display.style.display = 'block';
-    display.innerHTML = `<h2>🏆 Tournament Winner: ${name} 🏆</h2>`;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
 function advance(event) {
     const clicked = event.target;
     const matchContainer = clicked.parentElement;
@@ -181,12 +172,10 @@ function advance(event) {
 
     const currentRound = matchContainer.parentElement;
     const allMatches = Array.from(currentRound.querySelectorAll('.match'));
-    
     if (allMatches.every(m => m.dataset.done === "true")) {
         const winners = allMatches.map(m => m.querySelector('.winner').innerText);
         const container = document.getElementById('bracket-container');
         
-        // Remove subsequent rounds if we are re-advancing
         let nextSibling = currentRound.nextElementSibling;
         while(nextSibling) {
             container.removeChild(nextSibling);
@@ -196,8 +185,7 @@ function advance(event) {
         if (winners.length > 1) {
             setTimeout(() => createRound(winners), 500);
         } else {
-            // FIX: Call showWinner instead of alert
-            setTimeout(() => showWinner(winners[0]), 500);
+            setTimeout(() => alert("Winner: " + winners[0]), 500);
         }
     }
 }
@@ -209,6 +197,14 @@ btn.addEventListener('click', () => {
     container.appendChild(newDiv);
     document.getElementById('player-count').innerText = document.querySelectorAll('.name-input').length;
 });
+function showWinner(name) {
+    const display = document.getElementById('winner-display');
+    display.innerHTML = `<h2>🏆 Tournament Winner: ${name} 🏆</h2>`;
+    display.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-
-
+btn.addEventListener('click', () => {
+    container.innerHTML += `<div><label>Name: </label><input type="text" class="name-input"></div>`;
+    document.getElementById('player-count').innerText = document.querySelectorAll('.name-input').length;
+});

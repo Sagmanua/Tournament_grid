@@ -7,6 +7,14 @@
 </head>
 <body>
     <h1>Tournament Creator</h1>
+
+    <div class="app">
+    <div id="winner-display" class="winner-message"></div>
+    
+    
+
+
+
     <p>Total Players: <span id="player-count">2</span></p>
     
     <div id="form-container">
@@ -19,20 +27,32 @@
         <select id="team-size">
             <option value="1">1</option>
             <option value="2" selected>2</option>
-            <option value="3">3</option>
         </select>
         <button type="button" id="add-btn">Add Name Field</button>
         <button onclick="startDraft()">Start Selection Draft</button>
+
     </div>
 
     <div id="roulette-container" style="display:none; text-align:center; margin: 20px 0;">
         <h2 id="status-msg">Press Spin to draft!</h2>
         <canvas id="wheelCanvas" width="400" height="400"></canvas>
         <br>
-        <button id="spin-btn" onclick="spin(remainingNames)" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Spin Wheel</button>
+        <button id="spin-btn" onclick="spin(remainingNames)">Spin for Player</button>
     </div>
 
     <div id="draft-board"></div>
+<!-- 
+            <button type="button" onclick="toggleMapSelector()">Toggle Map Selector</button>
+        <div id="map-container" style="display:none; text-align:center; margin-top: 30px; border: 1px solid #ccc; padding: 20px;">
+        <h2>Select a Map</h2>
+        <div class="carousel-wrapper">
+            <div id="carousel-inner" class="carousel-inner"></div>
+            <div class="pointer"></div>
+        </div>
+        <button onclick="startMapSpin()">Spin for Map</button>
+    </div>
+-->
+
 
     <div id="bracket-container" class="bracket-wrapper"></div>
 
