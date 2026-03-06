@@ -81,7 +81,7 @@ function drawRouletteWheel(names) {
         ctx.restore();
     }
 
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "White";
     ctx.beginPath();
     ctx.moveTo(400, 190); ctx.lineTo(400, 210); ctx.lineTo(380, 200); ctx.fill();
 }
