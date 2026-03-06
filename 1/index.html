@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tournament Bracket</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Tournament Creator</h1>
+    <div id="form-container">
+        <div><label>Name: </label><input type="text" class="name-input"></div>
+        <div><label>Name: </label><input type="text" class="name-input"></div>
+    </div>
+    
+    <button type="button" id="add-btn">Add Name Field</button>
+    <button onclick="generateTournament()">Create Tournament</button>
+
+    <div id="roulette-container" style="display:none; text-align:center; margin: 20px 0;">
+        <canvas id="wheelCanvas" width="400" height="400"></canvas>
+    </div>
+
+    <div id="bracket-container" class="bracket-wrapper"></div>
+
+    <script src="sript.js"></script>
+</body>
+</html>
