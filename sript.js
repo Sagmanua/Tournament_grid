@@ -301,5 +301,6 @@ function removeField(button) {
 }
 
 function updatePlayerCount() {
-    document.getElementById('player-count').innerText = document.querySelectorAll('.name-input').length;
+    const count = document.querySelectorAll('#form-container .name-input').length;
+    document.getElementById('player-count').innerText = count;
 }
