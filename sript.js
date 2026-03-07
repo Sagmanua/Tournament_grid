@@ -70,7 +70,6 @@ function updateViewForViewer(state) {
             ctx = canvas.getContext("2d");
         }
         
-        // Use the angle from the host
         startAngle = state.startAngle; 
         arc = Math.PI * 2 / state.remainingNames.length;
         
@@ -168,6 +167,15 @@ function advance(event) {
     matchContainer.dataset.done = "true";
 
     const currentRound = matchContainer.parentElement;
+    const bracket = document.getElementById('bracket-container');
+    const allRounds = Array.from(bracket.querySelectorAll('.round'));
+    const currentRoundIndex = allRounds.indexOf(currentRound);
+
+    for (let i = allRounds.length - 1; i > currentRoundIndex; i--) {
+        allRounds[i].remove();
+    }
+    // ----------------------------------------
+
     const allMatches = Array.from(currentRound.querySelectorAll('.match'));
     
     if (allMatches.every(m => m.dataset.done === "true")) {
@@ -188,7 +196,6 @@ function showWinner(name) {
     broadcastState(); 
 }
 
-// --- WHEEL DRAWING ---
 
 function setupWheel(names) {
     const canvas = document.getElementById("wheelCanvas");
@@ -228,7 +235,7 @@ function drawRouletteWheel(names) {
 }
 
 function spin() {
-    if (!isHost) return; // Safety check
+    if (!isHost) return; 
     const spinAngleStart = Math.random() * 10 + 10;
     let spinTime = 0;
     const spinTimeTotal = Math.random() * 3000 + 4000;
