@@ -124,3 +124,29 @@ button[onclick="startDraft()"] { background: #3b82f6; color: white; }
     from { opacity: 0; transform: scale(0.8); }
     to { opacity: 1; transform: scale(1); }
 }
+
+/* DELETE BUTTON STYLES */
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.delete-btn {
+    background: #ef4444; /* Red */
+    color: white;
+    padding: 8px 15px;
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+}
+
+/* Ensure the label doesn't shrink */
+#form-container label {
+    min-width: 60px;
+}

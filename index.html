@@ -2,59 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tournament Draft</title>
+    <title>Tournament Draft - Room System</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
 </head>
 <body>
     <h1>Tournament Creator</h1>
 
-    <div class="app">
-    <div id="winner-display" class="winner-message"></div>
-    
-    
-
-
-
-    <p>Total Players: <span id="player-count">2</span></p>
-    
-    <div id="form-container">
-        <div><label>Name: </label><input type="text" class="name-input" value="Player 1"></div>
-        <div><label>Name: </label><input type="text" class="name-input" value="Player 2"></div>
+    <div id="landing-screen" style="text-align: center; margin-top: 50px;">
+        <button onclick="initRoom('host')" style="background: #10b981;">Create Room</button>
+        <div style="margin: 20px 0;">OR</div>
+        <input type="text" id="join-code" placeholder="Enter Room Number" class="name-input" style="width: 200px; display: inline-block;">
+        <button onclick="initRoom('viewer')" style="background: #3b82f6;">Connect to Room</button>
     </div>
 
-    <div class="controls">
-        <label>Players per team: </label>
-        <select id="team-size">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-        </select>
-        <button type="button" id="add-btn">Add Name Field</button>
-        <button onclick="startDraft()">Start Selection Draft</button>
-
-    </div>
-
-    <div id="roulette-container" style="display:none; text-align:center; margin: 20px 0;">
-        <h2 id="status-msg">Press Spin to draft!</h2>
-        <canvas id="wheelCanvas" width="400" height="400"></canvas>
-        <br>
-        <button id="spin-btn" onclick="spin(remainingNames)">Spin for Player</button>
-    </div>
-
-    <div id="draft-board"></div>
-<!-- 
-            <button type="button" onclick="toggleMapSelector()">Toggle Map Selector</button>
-        <div id="map-container" style="display:none; text-align:center; margin-top: 30px; border: 1px solid #ccc; padding: 20px;">
-        <h2>Select a Map</h2>
-        <div class="carousel-wrapper">
-            <div id="carousel-inner" class="carousel-inner"></div>
-            <div class="pointer"></div>
+    <div id="main-app" class="app" style="display: none;">
+        <div id="room-info" style="background: #334155; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+            Room Code: <strong id="display-room-code">----</strong> | Role: <strong id="user-role">----</strong>
         </div>
-        <button onclick="startMapSpin()">Spin for Map</button>
+
+        <div id="winner-display" class="winner-message"></div>
+        <p>Total Players: <span id="player-count">2</span></p>
+        
+        <div id="host-controls">
+            <div id="form-container">
+                <div class="input-row">
+                    <label>Name: </label>
+                    <input type="text" class="name-input" value="Player 1">
+                    <button type="button" class="delete-btn" onclick="removeField(this)">×</button>
+                </div>
+                <div class="input-row">
+                    <label>Name: </label>
+                    <input type="text" class="name-input" value="Player 2">
+                    <button type="button" class="delete-btn" onclick="removeField(this)">×</button>
+                </div>
+            </div>
+
+            <div class="controls">
+                <label>Players per team: </label>
+                <select id="team-size">
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                </select>
+                <button type="button" id="add-btn">Add Name Field</button>
+                <button onclick="startDraft()">Start Selection Draft</button>
+            </div>
+        </div>
+
+        <div id="roulette-container" style="display:none; text-align:center; margin: 20px 0;">
+            <h2 id="status-msg">Press Spin to draft!</h2>
+            <canvas id="wheelCanvas" width="400" height="400"></canvas>
+            <br>
+            <button id="spin-btn" onclick="spin(remainingNames)">Spin for Player</button>
+        </div>
+
+        <div id="draft-board"></div>
+        <div id="bracket-container" class="bracket-wrapper"></div>
     </div>
--->
-
-
-    <div id="bracket-container" class="bracket-wrapper"></div>
 
     <script src="sript.js"></script>
 </body>
